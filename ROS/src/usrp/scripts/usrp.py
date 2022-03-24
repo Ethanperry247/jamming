@@ -1,17 +1,10 @@
 #!/usr/bin/env python2
 
-# GNU Radio drivers for RSSI probing
+# ROS imports
+import rospy
+from std_msgs.msg import String, Int32
 
-if __name__ == '__main__':
-    import ctypes
-    import sys
-    if sys.platform.startswith('linux'):
-        try:
-            x11 = ctypes.cdll.LoadLibrary('libX11.so')
-            x11.XInitThreads()
-        except:
-            print "Warning: failed to XInitThreads()"
-
+# GNURadio imports
 from PyQt4 import Qt
 from gnuradio import blocks
 from gnuradio import eng_notation
@@ -27,6 +20,7 @@ import sys
 import time
 from gnuradio import qtgui
 
+top = None
 
 class top_block(gr.top_block, Qt.QWidget):
 
@@ -204,7 +198,9 @@ def main(top_block_cls=top_block, options=None):
 
     tb = top_block_cls()
     tb.start()
-    tb.show()
+    # tb.show()
+    global top
+    top = tb
 
     def quitting():
         tb.stop()
@@ -212,6 +208,30 @@ def main(top_block_cls=top_block, options=None):
     qapp.connect(qapp, Qt.SIGNAL("aboutToQuit()"), quitting)
     qapp.exec_()
 
+    
+def usrp():
+    global top
+    rospy.init_node('usrp', anonymous=True)
+    rate = rospy.Rate(120) # 10hz
+    pub = rospy.Publisher("/rss", Int32, queue_size=2)
+
+    while not rospy.is_shutdown():
+        i = Int32()
+        i.data = top.blocks_probe_signal_x_0
+        pub.publish(i)
+        rate.sleep()
 
 if __name__ == '__main__':
-    main()
+    import ctypes
+    import sys
+    if sys.platform.startswith('linux'):
+        try:
+            x11 = ctypes.cdll.LoadLibrary('libX11.so')
+            x11.XInitThreads()
+            main()
+            try:
+                usrp()
+            except rospy.ROSInterruptException:
+                pass
+        except:
+            print "Warning: failed to XInitThreads()"
