@@ -15,7 +15,8 @@ def main(threshold, epsilon, policy):
 	# Add the robot's starting position to the polygon
 	agent.append_polygon()
 
-	while (not agent.check_polygon_complete()):
+	step_count = 0
+	while not agent.check_polygon_complete() and step_count < 78:
 		try:
 			# Calculates the RSSI measured by the agent in its current position.
 			current_rssi = agent.measure_rssi(map)
@@ -25,25 +26,36 @@ def main(threshold, epsilon, policy):
 		# Identifies the angle of maximum intensity, or the angle from the robot to the jammer source.
 		maximum_intensity = agent.get_maximum_intensity_angle(map)
 
-		# Current position of the agent.
-		current_pose = agent.get_pose()
+		# # Current position of the agent.
+		# current_pose = agent.get_pose()
+		#
+		# difference = abs((maximum_intensity - current_pose['forward'])) % (math.pi / 2)
+		# adjusted_difference = difference / (math.pi / 2)
+		#
+		# # Change the rotation of the agent to the angle of maximum intensity.
+		# agent.rotate_absolute(maximum_intensity)
+		#
+		# if (current_rssi > threshold + epsilon):
+		# 	# Reorient robot and move away from threshold.
+		# 	agent.orient((policy['angle_adjustment']) * adjusted_difference)
+		#
+		# if (current_rssi < threshold - epsilon):
+		# 	# Move towards the threshold.
+		# 	agent.orient(-(policy['angle_adjustment'] * adjusted_difference))
 
-		difference = abs((maximum_intensity - current_pose['forward'])) % (math.pi / 2)
-		adjusted_difference = difference / (math.pi / 2)
-
-		# Change the rotation of the agent to the angle of maximum intensity.
-		agent.rotate_absolute(maximum_intensity)
-
-		if (current_rssi > threshold + epsilon):
-			# Reorient robot and move away from threshold.
-			agent.orient((policy['angle_adjustment']) * adjusted_difference)
-
-		if (current_rssi < threshold - epsilon):
-			# Move towards the threshold.
-			agent.orient(-(policy['angle_adjustment'] * adjusted_difference))
-
+		# Check if we are at the desired threshold
+		if threshold - epsilon < current_rssi < threshold + epsilon:
+			# Move adjacent to jammer
+			agent.orient(maximum_intensity - (math.pi / 2))
+		elif current_rssi < threshold:
+			# Not at threshold, move towards jammer
+			agent.orient(maximum_intensity)
+		else:
+			# Over desired threshold, move backwards
+			agent.orient(-maximum_intensity)
 		agent.take_step()
 		agent.append_polygon()
+		step_count += 1
 
 	final_polygon = agent.get_polygon()
 	print("Done!")
@@ -75,8 +87,8 @@ main(5.5, 1, {
 	'angle_adjustment': math.pi / 16,
 	'step_size': 0.1,
 	'initial_pose': {
-		'x': 1.5,
-		'y': 1.5,
+		'x': 0,
+		'y': 0,
 		'theta': 0,
 		'forward': 0
 	}

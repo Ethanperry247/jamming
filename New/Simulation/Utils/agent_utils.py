@@ -48,7 +48,7 @@ class Agent:
 
 	# Changes the robots notion of "forward," such that it will translate in a different direction upon the next step.
 	def orient(self, theta):
-		self.pose['forward'] += theta
+		self.pose['forward'] = theta
 
 	# Increases agent step counter and translates the robot by a predefined step size.
 	def take_step(self):
