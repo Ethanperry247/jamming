@@ -42,16 +42,17 @@ class Map:
 
 	# Scan the map for the position of maximum intensity.
 	def get_maximum_intensity_position(self):
-		max = self.map[0][0]
+		maxRSSI = self.map[0][0]
 		pos = {
 			'x': 0,
 			'y': 0
 		}
 		for row_idx, row in enumerate(self.map):
 			for col_idx, col in enumerate(row):
-				if col > max:
+				if col > maxRSSI:
 					pos = {
 						'x': row_idx,
 						'y': col_idx
 					}
+					maxRSSI = col
 		return pos

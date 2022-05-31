@@ -12,8 +12,10 @@ def main(threshold, epsilon, policy):
 	agent = Agent(20, policy['step_size'], policy['initial_pose'])
 	map = Map('./Maps/map_1.csv')
 
+	# Add the robot's starting position to the polygon
+	agent.append_polygon()
+
 	while (not agent.check_polygon_complete()):
-		# current_rssi = None
 		try:
 			# Calculates the RSSI measured by the agent in its current position.
 			current_rssi = agent.measure_rssi(map)
