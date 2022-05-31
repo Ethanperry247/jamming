@@ -2,7 +2,7 @@ from .map_utils import Map
 import math
 
 
-class Agent():
+class Agent:
     def __init__(self, threshold, step_size, initial_pose = None) -> None:
         
         if (initial_pose is not None):
