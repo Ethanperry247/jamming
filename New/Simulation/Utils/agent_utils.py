@@ -23,13 +23,14 @@ class Agent:
 				'theta': 0,
 				'forward': 0
 			}
-
+		# Path list, used to track ALL movements
 		self.path = []
+		# Polygon list, used to track threshold points
 		self.polygon = []
 		self.step = 0
 		self.step_size = step_size
 		self.threshold = threshold
-		self.append_polygon()
+		self.path.append(self.pose)
 
 	def measure_rssi(self, map: Map):
 		return map.rssi_from_current_pose(self.pose)
@@ -37,12 +38,10 @@ class Agent:
 	# Rotates the directional antenna by a relative amount.
 	def rotate(self, theta):
 		self.pose['theta'] += theta
-		self.path.append(self.pose)
 
 	# Rotates the directional antenna to a specified angle.
 	def rotate_absolute(self, theta):
 		self.pose['theta'] = theta
-		self.path.append(self.pose)
 
 	# Translates the robot by a relative x and y amount.
 	def translate(self, x, y):
@@ -54,7 +53,6 @@ class Agent:
 			'forward': self.pose['forward'],
 			'theta': self.pose['theta'],
 		}
-		self.path.append(self.pose)
 
 	# Changes the robots notion of "forward," such that it will translate in a different direction upon the next step.
 	def orient(self, theta):
@@ -67,6 +65,7 @@ class Agent:
 		print(x)
 		print(y)
 		self.translate(x, y)
+		self.path.append(self.pose)
 		self.step += 1
 
 	# Appends a position to the agent's tracked polygon.
@@ -91,14 +90,12 @@ class Agent:
 	def check_polygon_complete(self):
 		retVal = False
 		if self.step > 1 and len(self.polygon) > 2:
-			polygon_sat = False
 			last_pose = self.polygon[-2]
 			current_pose = self.polygon[-1]
 			prev_pose = self.polygon[0]
 
 			# For all poses from start until before the last two moves ...
 			for pose in itertools.islice(self.polygon, 0, len(self.polygon) - 2):
-				# print(pose)
 				# Check if last_pose -> current_pose overlaps prev_pose -> pose
 				if intersect([last_pose['x'], last_pose['y']], [current_pose['x'], current_pose['y']],
 							 [prev_pose['x'], prev_pose['y']], [pose['x'], pose['y']]):
