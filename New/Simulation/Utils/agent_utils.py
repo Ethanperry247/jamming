@@ -1,6 +1,15 @@
 import math
-
+import itertools
 from .map_utils import Map
+
+
+def ccw(A, B, C):
+	return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
+
+
+# Return true if line segments AB and CD intersect
+def intersect(A, B, C, D):
+	return ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D)
 
 
 class Agent:
@@ -20,6 +29,7 @@ class Agent:
 		self.step = 0
 		self.step_size = step_size
 		self.threshold = threshold
+		self.append_polygon()
 
 	def measure_rssi(self, map: Map):
 		return map.rssi_from_current_pose(self.pose)
@@ -79,14 +89,22 @@ class Agent:
 
 	# Checks to see if the robot has completed a full loop around the polygon.
 	def check_polygon_complete(self):
+		retVal = False
 		if self.step > 1 and len(self.polygon) > 2:
-			# If the first and final points are within one step of one another (an epsilon), then consider the polygon to be completed.
-			polygon_satisfied = self.polygon[-1]['x'] + self.step_size > self.polygon[0]['x'] > self.polygon[-1]['x'] - self.step_size and \
-                                self.polygon[-1]['y'] + self.step_size > self.polygon[0]['y'] > self.polygon[-1]['y'] - self.step_size
+			polygon_sat = False
+			last_pose = self.polygon[-2]
+			current_pose = self.polygon[-1]
+			prev_pose = self.polygon[0]
 
-			if polygon_satisfied:
-				return True
-			else:
-				return False
-		else:
-			return False
+			# For all poses from start until before the last two moves ...
+			for pose in itertools.islice(self.polygon, 0, len(self.polygon) - 2):
+				# print(pose)
+				# Check if last_pose -> current_pose overlaps prev_pose -> pose
+				if intersect([last_pose['x'], last_pose['y']], [current_pose['x'], current_pose['y']],
+							 [prev_pose['x'], prev_pose['y']], [pose['x'], pose['y']]):
+					# We over-lapped our tracks!
+					retVal = True
+					break
+				prev_pose = pose
+
+		return retVal
