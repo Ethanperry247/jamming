@@ -79,7 +79,8 @@ class Agent:
 		return self.pose
 
 	# Returns the angle from the robot on the map compared to position of maximum intensity (jammer source) on that map.
-	# NOTE: This currently overlooks how an actual agent would find the angle of maximum intensity by rotating its antenna back and forth to find such an angle (kind of like how a radar scanner would).
+	# NOTE: This currently overlooks how an actual agent would find the angle of maximum intensity by rotating its
+	# antenna back and forth to find such an angle (kind of like how a radar scanner would).
 	def get_maximum_intensity_angle(self, map):
 		max_intensity_pose = map.get_maximum_intensity_position()
 		angle = math.atan2(max_intensity_pose['y'] - self.pose['y'], max_intensity_pose['x'] - self.pose['x'])

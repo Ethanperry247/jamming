@@ -11,12 +11,8 @@ class Map:
 		print(self.map)
 
 		# Map must be at least a 1x1 in size.
-		if (len(self.map) < 1 or len(self.map[0]) < 1):
+		if len(self.map) < 1 or len(self.map[0]) < 1:
 			raise
-
-	# Reads map into memory from given filepath.
-	def read_map(filepath):
-		pass
 
 	# Given a agent pose and in-memory map, calculate RSSI at current position.
 	def rssi_from_current_pose(self, pose):

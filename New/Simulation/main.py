@@ -8,18 +8,17 @@ from Utils.map_utils import Map
 # Robot follows RSSI threshold to the right at all times. 
 def main(threshold, epsilon, policy):
 	agent = Agent(20, policy['step_size'], policy['initial_pose'])
-	map = Map('./Maps/map_1.csv')
+	rssi_map = Map('./Maps/map_1.csv')
 
-	step_count = 0
 	while not agent.check_polygon_complete():
 		try:
 			# Calculates the RSSI measured by the agent in its current position.
-			current_rssi = agent.measure_rssi(map)
+			current_rssi = agent.measure_rssi(rssi_map)
 		except Exception:
 			break
 
 		# Identifies the angle of maximum intensity, or the angle from the robot to the jammer source.
-		maximum_intensity = agent.get_maximum_intensity_angle(map)
+		maximum_intensity = agent.get_maximum_intensity_angle(rssi_map)
 
 		# Check if we are at the desired threshold
 		if threshold - epsilon < current_rssi < threshold + epsilon:
@@ -34,7 +33,6 @@ def main(threshold, epsilon, policy):
 			# Over desired threshold, move backwards
 			agent.orient(-maximum_intensity)
 		agent.take_step()
-		step_count += 1
 
 	print("Done!")
 
@@ -61,15 +59,15 @@ def main(threshold, epsilon, policy):
 		if idx != 0:
 			polygon_graph.add_edge(idx - 1, idx)
 		color_map.append('blue')
-	max_intensity_pos = map.get_maximum_intensity_position()
+	max_intensity_pos = rssi_map.get_maximum_intensity_position()
 	polygon_graph.add_node(len(final_polygon), pos=(max_intensity_pos['x'], max_intensity_pos['y']))
 	color_map.append('red')
 	pos = nx.get_node_attributes(polygon_graph, 'pos')
 	nx.draw(polygon_graph, pos, node_color=color_map, with_labels=False, node_size=15)
 
 	# Show-off our awesome solution!
-	plt.xlim([-1, 8])
-	plt.ylim([-1, 8])
+	plt.xlim([-0.5, 7.5])
+	plt.ylim([-0.5, 7.5])
 	plt.show()
 
 
