@@ -45,8 +45,6 @@ class Agent:
 
 	# Translates the robot by a relative x and y amount.
 	def translate(self, x, y):
-		self.pose['x'] += x
-		self.pose['y'] += y
 		self.pose = {
 			'x': self.pose['x'] + x,
 			'y': self.pose['y'] + y,
@@ -62,8 +60,7 @@ class Agent:
 	def take_step(self):
 		x = math.cos(self.pose['forward']) * self.step_size
 		y = math.sin(self.pose['forward']) * self.step_size
-		print(x)
-		print(y)
+		print("Move :", x, y)
 		self.translate(x, y)
 		self.path.append(self.pose)
 		self.step += 1

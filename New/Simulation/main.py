@@ -10,29 +10,41 @@ def main(threshold, epsilon, policy):
 	agent = Agent(20, policy['step_size'], policy['initial_pose'])
 	rssi_map = Map('./Maps/map_1.csv')
 
+	first = True
 	while not agent.check_polygon_complete():
-		try:
-			# Calculates the RSSI measured by the agent in its current position.
-			current_rssi = agent.measure_rssi(rssi_map)
-		except Exception:
-			break
-
-		# Identifies the angle of maximum intensity, or the angle from the robot to the jammer source.
-		maximum_intensity = agent.get_maximum_intensity_angle(rssi_map)
-
-		# Check if we are at the desired threshold
-		if threshold - epsilon < current_rssi < threshold + epsilon:
-			# Add this point to the polygon
-			agent.append_polygon()
+		if not first:
+			# Move to a new point
+			maximum_intensity = agent.get_maximum_intensity_angle(rssi_map)
 			# Move adjacent to jammer
 			agent.orient(maximum_intensity - (math.pi / 2))
-		elif current_rssi < threshold:
-			# Not at threshold, move towards jammer
-			agent.orient(maximum_intensity)
+			agent.take_step()
+			agent.take_step()
 		else:
-			# Over desired threshold, move backwards
-			agent.orient(-maximum_intensity)
-		agent.take_step()
+			first = False
+
+		# Find desired RSSI level
+		threshold_found = False
+		while not threshold_found:
+			# Calculates the RSSI measured by the agent in its current position.
+			current_rssi = agent.measure_rssi(rssi_map)
+
+			# Identifies the angle of maximum intensity, or the angle from the robot to the jammer source.
+			maximum_intensity = agent.get_maximum_intensity_angle(rssi_map)
+
+			# Check if we are at the desired threshold
+			if threshold - epsilon < current_rssi < threshold + epsilon:
+				print("Found threshold")
+				# Add this point to the polygon
+				agent.append_polygon()
+				threshold_found = True
+			elif current_rssi < threshold:
+				# Not at threshold, move towards jammer
+				agent.orient(maximum_intensity)
+				agent.take_step()
+			else:
+				# Over desired threshold, move backwards
+				agent.orient(maximum_intensity + math.pi)
+				agent.take_step()
 
 	print("Done!")
 
@@ -72,9 +84,9 @@ def main(threshold, epsilon, policy):
 
 
 # Step size and angle adjustment determine the turning speed and step size for one iteration of the robots movement.
-main(5.5, 1, {
+main(5.5, 0.5, {
 	'angle_adjustment': math.pi / 16,
-	'step_size': 0.1,
+	'step_size': 0.05,
 	'initial_pose': {
 		'x': 0,
 		'y': 0,
