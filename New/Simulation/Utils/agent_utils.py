@@ -69,6 +69,15 @@ class Agent:
 	def append_polygon(self):
 		self.polygon.append(self.pose)
 
+	def append_polygon(self, x, y):
+		temp_pose = {
+			'x': x,
+			'y': y,
+			'theta': self.pose['theta'],
+			'forward': self.pose['forward']
+		}
+		self.polygon.append(temp_pose)
+
 	def get_polygon(self):
 		return self.polygon
 

@@ -1,4 +1,5 @@
 import math
+import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 from Utils.agent_utils import Agent
@@ -22,29 +23,74 @@ def main(threshold, epsilon, policy):
 		else:
 			first = False
 
-		# Find desired RSSI level
-		threshold_found = False
-		while not threshold_found:
-			# Calculates the RSSI measured by the agent in its current position.
-			current_rssi = agent.measure_rssi(rssi_map)
+		# Calculates the RSSI measured by the agent in its current position.
+		current_rssi = agent.measure_rssi(rssi_map)
+		# If RSSI is above the threshold, move backwards
+		if current_rssi > threshold:
+			move_towards_jammer = False
+		else:
+			# Move towards the jammer
+			move_towards_jammer = True
 
+		# Find desired RSSI level
+		threshold_crossed = False
+		pose_stack = [agent.pose]
+		while not threshold_crossed:
 			# Identifies the angle of maximum intensity, or the angle from the robot to the jammer source.
 			maximum_intensity = agent.get_maximum_intensity_angle(rssi_map)
 
-			# Check if we are at the desired threshold
-			if threshold - epsilon < current_rssi < threshold + epsilon:
-				print("Found threshold")
-				# Add this point to the polygon
-				agent.append_polygon()
-				threshold_found = True
-			elif current_rssi < threshold:
-				# Not at threshold, move towards jammer
+			# Orientate the robot
+			if move_towards_jammer:
 				agent.orient(maximum_intensity)
-				agent.take_step()
 			else:
-				# Over desired threshold, move backwards
 				agent.orient(maximum_intensity + math.pi)
-				agent.take_step()
+
+			# Move forward
+			agent.take_step()
+			# Add new position to pose stack
+			pose_stack.append(agent.pose)
+			# Calculates the RSSI measured by the agent in its current position.
+			current_rssi = agent.measure_rssi(rssi_map)
+
+			if move_towards_jammer and current_rssi > threshold and len(pose_stack) > 2:
+				threshold_crossed = True
+			elif not move_towards_jammer and current_rssi < threshold and len(pose_stack) > 2:
+				threshold_crossed = True
+
+			# # Check if we are at the desired threshold
+			# if threshold - epsilon < current_rssi < threshold + epsilon:
+			# 	print("Found threshold")
+			# 	# Add this point to the polygon
+			# 	agent.append_polygon()
+			# 	threshold_crossed = True
+			# elif current_rssi < threshold:
+			# 	# Not at threshold, move towards jammer
+			# 	agent.orient(maximum_intensity)
+			# 	agent.take_step()
+			# else:
+			# 	# Over desired threshold, move backwards
+			# 	agent.orient(maximum_intensity + math.pi)
+			# 	agent.take_step()
+
+		# # Determine the threshold point
+		# x1 = pose_stack[-1]['x']
+		# y1 = pose_stack[-1]['y']
+		# x2 = pose_stack[-2]['x']
+		# y2 = pose_stack[-2]['y']
+		# x3 = pose_stack[-3]['x']
+		# y3 = pose_stack[-3]['y']
+		#
+		# A = (x3*(y2 - y1) + x2*(y1 - y3) + x1*(y3 - y2)) / ((x1 - x2)*(x1 - x3)*(x2 - x3))
+		# B = (x1*x1*(y2 - y3) + x3*x3*(y1 - y2) + x2*x2*(y3 - y1)) / ((x1 - x2)*(x1 - x3)*(x2 - x3))
+		# C = (x2*x2*(x3*y1 - x1*y3) + x2*(x1*x1*y3 - x3*x3*y1) + x1*x3*(x3 - x1)*y2) / ((x1 - x2)*(x1 - x3)*(x2 - x3))
+		#
+		# # Find the roots of this polynomial
+		# coeff = [A, B, C]
+		# roots = np.roots(coeff)
+		# print(roots)
+		# # TODO: Break this down into x-plane and y-plane
+
+		agent.append_polygon(pose_stack[-2]['x'], pose_stack[-2]['y'])
 
 	print("Done!")
 
@@ -84,7 +130,7 @@ def main(threshold, epsilon, policy):
 
 
 # Step size and angle adjustment determine the turning speed and step size for one iteration of the robots movement.
-main(5.5, 0.5, {
+main(5.5, 0, {
 	'angle_adjustment': math.pi / 16,
 	'step_size': 0.05,
 	'initial_pose': {
