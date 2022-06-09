@@ -34,44 +34,50 @@ options:
 
 blocks:
 - name: band_width
-  id: variable
+  id: variable_qtgui_entry
   parameters:
     comment: ''
-    value: 20e6
+    gui_hint: (0,1)
+    label: Source Bandwidth
+    type: real
+    value: '20000000'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [376, 0.0]
+    coordinate: [344, 12.0]
     rotation: 0
-    state: enabled
+    state: true
 - name: freq
   id: variable_qtgui_entry
   parameters:
     comment: ''
-    gui_hint: ''
-    label: ''
+    gui_hint: (0,0)
+    label: FM Station
     type: real
     value: 101.1e6
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [216, 80.0]
+    coordinate: [280, 92.0]
     rotation: 0
     state: true
 - name: samp_rate
-  id: variable
+  id: variable_qtgui_entry
   parameters:
     comment: ''
-    value: 5e6
+    gui_hint: (0,2)
+    label: Sample Rate
+    type: real
+    value: '5000000'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [248, 0.0]
+    coordinate: [224, 12.0]
     rotation: 0
-    state: enabled
+    state: true
 - name: analog_wfm_rcv_0
   id: analog_wfm_rcv
   parameters:
@@ -86,7 +92,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [872, 232.0]
+    coordinate: [680, 236.0]
     rotation: 0
     state: true
 - name: audio_sink_0
@@ -103,7 +109,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1384, 240.0]
+    coordinate: [1144, 244.0]
     rotation: 0
     state: true
 - name: blocks_wavfile_sink_0
@@ -125,7 +131,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1392, 44.0]
+    coordinate: [1152, 124.0]
     rotation: 0
     state: true
 - name: low_pass_filter_0
@@ -143,13 +149,94 @@ blocks:
     minoutbuf: '0'
     samp_rate: samp_rate
     type: fir_filter_ccf
-    width: 10e3
+    width: '10000'
     win: window.WIN_HAMMING
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [584, 184.0]
+    coordinate: [464, 196.0]
+    rotation: 0
+    state: true
+- name: qtgui_freq_sink_x_0
+  id: qtgui_freq_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'False'
+    average: '0.05'
+    axislabels: 'True'
+    bw: band_width
+    color1: '"blue"'
+    color10: '"dark blue"'
+    color2: '"red"'
+    color3: '"green"'
+    color4: '"black"'
+    color5: '"cyan"'
+    color6: '"magenta"'
+    color7: '"yellow"'
+    color8: '"dark red"'
+    color9: '"dark green"'
+    comment: ''
+    ctrlpanel: 'False'
+    fc: freq
+    fftsize: '1024'
+    freqhalf: 'True'
+    grid: 'False'
+    gui_hint: ''
+    label: Relative Gain
+    label1: ''
+    label10: ''''''
+    label2: ''''''
+    label3: ''''''
+    label4: ''''''
+    label5: ''''''
+    label6: ''''''
+    label7: ''''''
+    label8: ''''''
+    label9: ''''''
+    legend: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    name: '""'
+    nconnections: '1'
+    norm_window: 'False'
+    showports: 'False'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_tag: '""'
+    type: complex
+    units: dB
+    update_time: '0.10'
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    ymax: '10'
+    ymin: '-140'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [464, 468.0]
     rotation: 0
     state: true
 - name: qtgui_sink_x_0_0
@@ -160,7 +247,7 @@ blocks:
     bw: band_width
     comment: ''
     fc: freq
-    fftsize: '2048'
+    fftsize: '4096'
     gui_hint: ''
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -169,7 +256,7 @@ blocks:
     plotfreq: 'True'
     plottime: 'True'
     plotwaterfall: 'True'
-    rate: '5000000'
+    rate: '1000000000'
     showports: 'False'
     showrf: 'True'
     type: complex
@@ -178,7 +265,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [584, 388.0]
+    coordinate: [464, 348.0]
     rotation: 0
     state: true
 - name: qtgui_sink_x_0_0_0
@@ -207,7 +294,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1400, 372.0]
+    coordinate: [1144, 300.0]
     rotation: 0
     state: true
 - name: rational_resampler_xxx_0
@@ -227,7 +314,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1136, 212.0]
+    coordinate: [920, 220.0]
     rotation: 0
     state: true
 - name: uhd_usrp_source_0
@@ -674,6 +761,7 @@ connections:
 - [rational_resampler_xxx_0, '0', blocks_wavfile_sink_0, '0']
 - [rational_resampler_xxx_0, '0', qtgui_sink_x_0_0_0, '0']
 - [uhd_usrp_source_0, '0', low_pass_filter_0, '0']
+- [uhd_usrp_source_0, '0', qtgui_freq_sink_x_0, '0']
 - [uhd_usrp_source_0, '0', qtgui_sink_x_0_0, '0']
 
 metadata:
