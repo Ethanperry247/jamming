@@ -85,6 +85,14 @@ class Simple_2_4_Receiver(gr.top_block):
     def get_usrp_sensor(self):
         return self.uhd_usrp_source_0.get_sensor(self.get_usrp_sensor_name()[1],0)
 
+    def get_usrp_sensor_avg(self):
+        num_samps = 10
+        rssi_sum = 0
+        # Grab num_samps readings and average them together
+        for x in range(num_samps):
+            rssi_sum += self.get_usrp_sensor().to_real()
+        return rssi_sum/num_samps
+
     def get_usrp_finite_acquisition(self, n):
         return self.uhd_usrp_source_0.finite_acquisition_v(n)
 
@@ -111,10 +119,13 @@ def main(top_block_cls=Simple_2_4_Receiver, options=None):
 
     tb.start()
 
-    try:
-        input('Press Enter to quit: ')
-    except EOFError:
-        pass
+    run = 't'
+    while run != 'q':
+        try:
+            print(tb.get_usrp_sensor_avg())
+            run = input('Press \'q\' quit: ')
+        except EOFError:
+            pass
     tb.stop()
     tb.wait()
 
