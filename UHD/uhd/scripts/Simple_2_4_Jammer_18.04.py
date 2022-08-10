@@ -34,7 +34,7 @@ class Simple_2_4_Jammer(gr.top_block):
         self.sig_sink_input_toggle_switch = sig_sink_input_toggle_switch = 0
         self.sig_sink_bandwidth = sig_sink_bandwidth = 20000000
         self.samp_rate = samp_rate = 3840000
-        self.gain_select = gain_select = 70
+        self.gain_select = gain_select = 100
         self.band2400MHz_bandwidth = band2400MHz_bandwidth = 70000000
 
         ##################################################
@@ -120,6 +120,12 @@ class Simple_2_4_Jammer(gr.top_block):
     def set_band2400MHz_bandwidth(self, band2400MHz_bandwidth):
         self.band2400MHz_bandwidth = band2400MHz_bandwidth
 
+    def activate_usrp_jammer(self):
+        self.set_sig_sink_input_toggle_switch(1)
+
+    def deactivate_usrp_jammer(self):
+        self.set_sig_sink_input_toggle_switch(0)
+
 
 
 
@@ -139,6 +145,7 @@ def main(top_block_cls=Simple_2_4_Jammer, options=None):
     tb.start()
 
     try:
+        tb.activate_usrp_jammer()
         input('Press Enter to quit: ')
     except EOFError:
         pass
